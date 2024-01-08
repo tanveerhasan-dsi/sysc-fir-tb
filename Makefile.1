@@ -1,0 +1,39 @@
+SYSTEMC_ARCH=linux64
+LIB_DIRS=$(SYSTEMC)/lib-$(SYSTEMC_ARCH)
+
+INCLUDE_DIRS= -I. -I$(SYSTEMC)/include 
+
+HEADERS = fir.h tb.h 
+
+SOURCES = main.cpp fir.cpp tb.cpp 
+
+DEPENDENCIES = \
+	Makefile \
+	$(HEADERS) \ 
+	$(SOURCES) 
+
+LIBS = -lsystemc -lstdc++ -lm 
+
+TESTS = main
+
+all: $(TESTS) 
+	./$(TESTS) 
+	@make cmp_result
+
+$(TESTS): $(DEPENDENCIES)
+	gcc =g -o $@ $(SOURCES) $(INCLTEMC_ARCH) -L$(LIB_DIRS) $(LIBS)
+
+clean: 
+	rm -f $(TESTS) *.dat 
+
+GOLD_DIR = ./golden
+GOLD_FILE = $(GOLD_DIR)/ref_output.dat
+
+cmp_result: 
+	@echo "**********************************************"
+	@if diff -w $(GOLD_FILE) ./output.dat : then \
+		echo "Simulation passed"; \
+	else \
+		echo "Simulation failed"; \
+	fi
+	@echo "**********************************************"
